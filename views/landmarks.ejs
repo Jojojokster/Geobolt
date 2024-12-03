@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Upload Landmark</title>
+<link rel="stylesheet" href="/style.css">
+<!-- Unicons -->
+<link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css" />
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="/" class="nav_logo">Geobolt</a>
+            <ul class="nav_items">
+                <li class="nav_item">
+                    <a href="/" class="nav_link">Home</a>
+                    <a href="/about" class="nav_link">About</a>
+                    <a href="/landmarks" class="nav_link">Landmarks</a>
+                    <a href="/contact" class="nav_link">Contact</a>
+                </li>
+            </ul>
+            <% if (user) { %>
+                <form action="/logout" method="POST">
+                    <button class="button" type="submit">Logout</button>
+                </form>
+            <% } else { %>
+                <button class="button" id="form-open">Login</button>
+            <% } %>
+        </nav>
+    </header>
+
+     <!-- Home -->
+     <section class="home">
+        <div class="form_container">
+            <i class="uil uil-times form_close"></i>
+            <!-- Error Message -->
+            <div id="error-message" class="alert alert-danger mt-4" style="display: none;"></div>
+            
+            <!-- Login Form -->
+            <div class="form login_form">
+                <form action="/auth/login" method="POST">
+                    <h2>Login</h2>
+                    <div class="input_box">
+                        <input type="email" name="email" placeholder="Enter your email" required />
+                        <i class="uil uil-envelope-alt email"></i>
+                    </div>
+                    <div class="input_box">
+                        <input type="password" name="password" placeholder="Enter your password" required />
+                        <i class="uil uil-lock password"></i>
+                        <i class="uil uil-lock-eye-slash pw_hide"></i>
+                    </div>
+                    <div class="option_field">
+                        <span class="checkbox">
+                            <input type="checkbox" id="check">
+                            <label for="check">Remember me</label>
+                        </span>
+                        <a href="#" class="forget_pw">Forgot password?</a>
+                    </div>
+                    <button class="button">Login Now</button>
+                    <div class="login_signup">Don't have an account? <a href="#" id="signup">Signup Now</a></div>
+                </form>
+            </div>
+
+            <!-- Signup Form -->
+            <div class="form signup_form">
+                <form action="/auth/register" method="POST">
+                    <h2>Signup</h2>
+                    <div class="input_box">
+                        <input type="text" name="name" placeholder="Enter your name" required />
+                        <i class="uil uil-user user"></i>
+                    </div>
+                    <div class="input_box">
+                        <input type="email" name="email" placeholder="Enter your email" required />
+                        <i class="uil uil-envelope-alt email"></i>
+                    </div>
+                    <div class="input_box">
+                        <input type="password" name="password" placeholder="Create password" required />
+                        <i class="uil uil-lock password"></i>
+                        <i class="uil uil-lock-eye-slash pw_hide"></i>
+                    </div>
+                    <div class="input_box">
+                        <input type="password" name="confirm_password" placeholder="Confirm password" required />
+                        <i class="uil uil-lock password"></i>
+                        <i class="uil uil-lock-eye-slash pw_hide"></i>
+                    </div>
+                    <button class="button">Signup Now</button>
+                    <div class="login_signup">Already have an account? <a href="#" id="login">Login</a></div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Landmark Upload Section -->
+    <div class="form_1">
+        <section class="landmarks">
+            <h1>Upload Landmark</h1>
+            <% if (errorMessage) { %>
+                <div class="alert alert-danger">
+                    <%= errorMessage %>
+                </div>
+            <% } %>
+            <% if (successMessage) { %>
+                <div class="alert alert-success">
+                    <%= successMessage %>
+                </div>
+            <% } %>
+            <form action="/landmarks" method="POST" enctype="multipart/form-data">
+                <div class="input_box">
+                    <input type="text" name="name" placeholder="Enter landmark name" required />
+                    <i class="uil uil-map-marker"></i>
+                </div>
+                <div class="input_box">
+                    <input type="text" name="location" placeholder="Enter landmark location" required />
+                    <i class="uil uil-location-point"></i>
+                </div>
+                <div class="input_box">
+                    <input type="file" name="image" required />
+                    <i class="uil uil-image"></i>
+                </div>
+                <button class="button" type="submit">Upload</button>
+            </form>
+        </section>
+    </div>
+
+    <!-- Search Form -->
+    <div class="search_form">
+        <section class="search">
+            <h1>Search Landmarks</h1>
+            <form action="/landmarks" method="GET">
+                <div class="input_box">
+                    <input type="text" name="q" placeholder="Enter search term" required />
+                    <i class="uil uil-search"></i>
+                </div>
+                <button class="button" type="submit">Search</button>
+            </form>
+        </section>
+    </div>
+
+    <!-- Search Results -->
+    <% if (searchResults) { %>
+        <section class="search-results">
+            <h2>Search Results</h2>
+            <ul>
+                <% searchResults.forEach(result => { %>
+                    <li>
+                        <h3><%= result.name %></h3>
+                        <p>Location: <%= result.location %></p>
+                        <img src="/uploads/<%= result.image %>" alt="<%= result.name %>" width="200">
+                    </li>
+                <% }) %>
+            </ul>
+        </section>
+    <% } %>
+
+    <script src="/script.js"></script>
+</body>
+</html>
