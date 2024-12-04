@@ -80,12 +80,9 @@ initializePassport(
     }
 );
 
-// Routes
-const authRoutes = require('./routes/auth');
-const pageRoutes = require('./routes/pages');
-
-app.use('/auth', authRoutes);
-app.use('/', pageRoutes);
+// Define Routes
+app.use('/', require('./routes/pages'));
+app.use('/auth', require('./routes/auth.js'));
 
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
