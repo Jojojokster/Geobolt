@@ -50,7 +50,7 @@ const db = mysql.createPool({
 global.db = db;
 
 // Passport configuration
-require('./config/passport')(passport);
+require('./passport-config')(passport);
 
 // Routes
 const authRoutes = require('./routes/auth');
