@@ -23,7 +23,6 @@
             </ul>
             <% if (user) { %>
                 <form action="/logout" method="POST">
-                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     <button class="button" type="submit">Logout</button>
                 </form>
             <% } else { %>
@@ -34,6 +33,11 @@
 
     <!-- Home -->
     <section class="home">
+        <% if (user) { %>
+            <div class="greeting">
+                <h2>Welcome, <%= user.name %>!</h2>
+            </div>
+        <% } %>
         <div class="form_container">
             <i class="uil uil-times form_close"></i>
             <!-- Error Message -->
@@ -44,7 +48,6 @@
             <!-- Login Form -->
             <div class="form login_form">
                 <form action="/auth/login" method="POST">
-                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     <h2>Login</h2>
                     <div class="input_box">
                         <input type="email" name="email" placeholder="Enter your email" required />
@@ -70,7 +73,6 @@
             <!-- Signup Form -->
             <div class="form signup_form">
                 <form action="/auth/register" method="POST">
-                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     <h2>Signup</h2>
                     <div class="input_box">
                         <input type="text" name="name" placeholder="Enter your name" required />

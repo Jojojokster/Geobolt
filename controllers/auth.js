@@ -2,8 +2,6 @@ const mysql = require('mysql2/promise');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
-const flash = require('express-flash');
-const session = require('express-session');
 
 // Create a connection pool to the MySQL database
 const db = mysql.createPool({
@@ -88,6 +86,7 @@ exports.login = (req, res, next) => {
                     message: 'An error occurred'
                 });
             }
+            req.session.user = user; // Store user information in session
             return res.json({
                 status: 'success',
                 message: 'Login successful!'

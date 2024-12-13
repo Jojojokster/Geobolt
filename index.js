@@ -13,7 +13,6 @@ const passport = require('passport');
 const path = require('path');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
-const csrf = require('csurf');
 const initializePassport = require('./passport-config');
 
 // Load environment variables from .env file
@@ -24,7 +23,7 @@ const app = express();
 const port = process.env.PORT || 8000;
 
 // Middleware setup
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(flash());
@@ -39,10 +38,6 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-
-// Set up CSRF protection
-const csrfProtection = csrf({ cookie: true });
-app.use(csrfProtection);
 
 // Set the directory where Express will pick up HTML files
 app.set('views', path.join(__dirname, 'views'));
@@ -93,10 +88,6 @@ app.use('/auth', require('./routes/auth.js'));
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Render the home page with CSRF token
-app.get('/', (req, res) => {
-    res.render("index", { csrfToken: req.csrfToken(), user: req.user });
-});
 
 // Handle logout
 app.post("/logout", (req, res) => {

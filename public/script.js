@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     const formOpenBtn = document.querySelector("#form-open"),
-        home = document.querySelector(".home"),
         formContainer = document.querySelector(".form_container"),
         formCloseBtn = document.querySelector(".form_close"),
         signupBtn = document.querySelector("#signup"),
@@ -52,7 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const email = loginForm.querySelector("input[name='email']").value;
             const password = loginForm.querySelector("input[name='password']").value;
-            const csrfToken = loginForm.querySelector("input[name='_csrf']").value;
             if (!email || !password) {
                 errorMessage.textContent = "Please fill in all fields";
                 errorMessage.style.display = "block";
@@ -63,7 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'CSRF-Token': csrfToken // Include CSRF token in headers
                 },
                 body: JSON.stringify({ email, password })
             });
@@ -85,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = signupForm.querySelector("input[name='email']").value;
             const password = signupForm.querySelector("input[name='password']").value;
             const confirmPassword = signupForm.querySelector("input[name='confirm_password']").value;
-            const csrfToken = signupForm.querySelector("input[name='_csrf']").value;
 
             if (!name || !email || !password || !confirmPassword) {
                 errorMessage.textContent = "Please fill in all fields";
@@ -103,7 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'CSRF-Token': csrfToken // Include CSRF token in headers
                 },
                 body: JSON.stringify({ name, email, password, confirm_password: confirmPassword })
             });

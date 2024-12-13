@@ -32,9 +32,26 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// Render the home page with CSRF token
+// Render the home page
 router.get('/', (req, res) => {
-    res.render('index', { csrfToken: req.csrfToken(), user: req.user, weatherMessage: null, countryData: null });
+    res.render('index', { user: req.session.user, weatherMessage: null, countryData: null });
+});
+
+// Render the about page
+router.get('/about', (req, res) => {
+    res.render('about', { user: req.session.user });
+});
+
+// Render the landmarks pagen
+router.get('/landmarks', async (req, res) => {
+    const searchTerm = req.query.q || '';
+    try {
+        const [results] = await db.query('SELECT * FROM landmarks WHERE name LIKE ? OR location LIKE ?', [`%${searchTerm}%`, `%${searchTerm}%`]);
+        res.render('landmarks', { user: req.session.user, searchResults: results, errorMessage: null, successMessage: null });
+    } catch (error) {
+        console.error(error);
+        res.render('landmarks', { user: req.session.user, searchResults: [], errorMessage: 'An error occurred', successMessage: null });
+    }
 });
 
 // Redirect /register to home page
@@ -58,11 +75,11 @@ router.get('/weather', (req, res, next) => {
                     ' degrees in ' + weather.name +
                     '! The humidity now is: ' + 
                     weather.main.humidity;
-                res.render('index', { csrfToken: req.csrfToken(), user: req.user, weatherMessage: weatherMessage, countryData: null });
+                res.render('index', { user: req.user, weatherMessage: weatherMessage, countryData: null });
             } else {
-                res.render('index', { csrfToken: req.csrfToken(), user: req.user, weatherMessage: "No data found", countryData: null });
+                res.render('index', { user: req.user, weatherMessage: 'City not found', countryData: null });
             }
-        } 
+        }
     });
 });
 
@@ -79,30 +96,13 @@ router.get('/country', async (req, res, next) => {
 
         if (response.status === 200) {
             const countryData = response.data[0];
-            res.render('index', { messages: req.flash(), user: req.user, weatherMessage: null, countryData: countryData });
+            res.render('index', { user: req.user, weatherMessage: null, countryData: countryData });
         } else {
-            res.render('index', { messages: req.flash(), user: req.user, weatherMessage: null, countryData: null });
+            res.render('index', { user: req.user, weatherMessage: null, countryData: null });
         }
     } catch (error) {
         console.error(error);
-        res.render('index', { messages: req.flash(), user: req.user, weatherMessage: null, countryData: null });
-    }
-});
-
-// Render the about page
-router.get('/about', (req, res) => {
-    res.render('about', { user: req.user });
-});
-
-// Handle landmark search and upload
-router.get('/landmarks', async (req, res) => {
-    const searchTerm = req.query.q || '';
-    try {
-        const [results] = await db.query('SELECT * FROM landmarks WHERE name LIKE ? OR location LIKE ?', [`%${searchTerm}%`, `%${searchTerm}%`]);
-        res.render('landmarks', { user: req.user, searchResults: results, errorMessage: null, successMessage: null });
-    } catch (error) {
-        console.error(error);
-        res.render('landmarks', { user: req.user, searchResults: [], errorMessage: 'An error occurred', successMessage: null });
+        res.render('index', { user: req.user, weatherMessage: null, countryData: null });
     }
 });
 

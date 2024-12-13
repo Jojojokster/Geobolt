@@ -91,6 +91,16 @@ a {
     pointer-events: auto;
 }
 
+/* Greeting message */
+.greeting h2 {
+    position: fixed;
+    z-index: 100;
+    top: 10%;
+    left: 45%;
+    color: #fff;
+    text-align: center;
+}
+
 /* Form */
 .form_container {
     position: fixed;
