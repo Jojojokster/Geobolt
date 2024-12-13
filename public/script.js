@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     const formOpenBtn = document.querySelector("#form-open"),
-        home = document.querySelector(".home"),
         formContainer = document.querySelector(".form_container"),
         formCloseBtn = document.querySelector(".form_close"),
         signupBtn = document.querySelector("#signup"),
@@ -8,7 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
         pwShowHide = document.querySelectorAll(".pw_hide"),
         loginForm = document.querySelector(".login_form form"),
         signupForm = document.querySelector(".signup_form form"),
-        errorMessage = document.getElementById('error-message');
+        errorMessage = document.getElementById('error-message'),
+        successMessage = document.getElementById('success-message');
 
     if (formOpenBtn) {
         formOpenBtn.addEventListener("click", () => formContainer.classList.add("show"));
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/auth/login', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ email, password })
             });
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/auth/register', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ name, email, password, confirm_password: confirmPassword })
             });
@@ -107,7 +107,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 errorMessage.textContent = result.message;
                 errorMessage.style.display = "block";
             } else {
-                window.location.href = '/';
+                successMessage.textContent = result.message;
+                successMessage.style.display = "block";
+                errorMessage.style.display = "none";
             }
         });
     }

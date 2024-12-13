@@ -23,7 +23,7 @@ const app = express();
 const port = process.env.PORT || 8000;
 
 // Middleware setup
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(flash());
@@ -59,6 +59,7 @@ const db = mysql.createPool({
 // Make the database connection available globally
 global.db = db;
 
+// Test the database connection
 db.getConnection()
     .then(() => {
         console.log('Connected to database');
@@ -87,10 +88,8 @@ app.use('/auth', require('./routes/auth.js'));
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.get('/', (req, res) => {
-    res.render("index", { messages: req.flash(), user: req.user });
-});
 
+// Handle logout
 app.post("/logout", (req, res) => {
     req.logout(err => {
         if (err) return next(err);

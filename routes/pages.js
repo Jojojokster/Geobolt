@@ -7,6 +7,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
+// Create a connection pool to the MySQL database
 const db = mysql.createPool({
     host: process.env.DATABASE_HOST,
     user: process.env.DATABASE_USER,
@@ -31,16 +32,34 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+// Render the home page
 router.get('/', (req, res) => {
-    res.render('index', { messages: req.flash(), user: req.user, weatherMessage: null, countryData: null });
+    res.render('index', { user: req.session.user, weatherMessage: null, countryData: null });
 });
 
-// Add this route to handle direct access to /auth/register
+// Render the about page
+router.get('/about', (req, res) => {
+    res.render('about', { user: req.session.user });
+});
+
+// Render the landmarks pagen
+router.get('/landmarks', async (req, res) => {
+    const searchTerm = req.query.q || '';
+    try {
+        const [results] = await db.query('SELECT * FROM landmarks WHERE name LIKE ? OR location LIKE ?', [`%${searchTerm}%`, `%${searchTerm}%`]);
+        res.render('landmarks', { user: req.session.user, searchResults: results, errorMessage: null, successMessage: null });
+    } catch (error) {
+        console.error(error);
+        res.render('landmarks', { user: req.session.user, searchResults: [], errorMessage: 'An error occurred', successMessage: null });
+    }
+});
+
+// Redirect /register to home page
 router.get('/register', (req, res) => {
     res.redirect('/');
 });
 
-// Add the new route handler for /weather
+// Handle weather requests
 router.get('/weather', (req, res, next) => {
     let apiKey = '9494a52218427a68063ad1ca6a2a5a47';
     let city = req.query.city || 'london';
@@ -56,15 +75,15 @@ router.get('/weather', (req, res, next) => {
                     ' degrees in ' + weather.name +
                     '! The humidity now is: ' + 
                     weather.main.humidity;
-                res.render('index', { messages: req.flash(), user: req.user, weatherMessage: weatherMessage, countryData: null });
+                res.render('index', { user: req.user, weatherMessage: weatherMessage, countryData: null });
             } else {
-                res.render('index', { messages: req.flash(), user: req.user, weatherMessage: "No data found", countryData: null });
+                res.render('index', { user: req.user, weatherMessage: 'City not found', countryData: null });
             }
-        } 
+        }
     });
 });
 
-// Add the new route handler for /country
+// Handle country data requests
 router.get('/country', async (req, res, next) => {
     const countryName = req.query.name || 'United States';
     const apiKey = '62gPXGc7u3EYTgZ0nPEM5w==5LHr1ssP1xtOmRJC';
@@ -77,33 +96,17 @@ router.get('/country', async (req, res, next) => {
 
         if (response.status === 200) {
             const countryData = response.data[0];
-            res.render('index', { messages: req.flash(), user: req.user, weatherMessage: null, countryData: countryData });
+            res.render('index', { user: req.user, weatherMessage: null, countryData: countryData });
         } else {
-            res.render('index', { messages: req.flash(), user: req.user, weatherMessage: null, countryData: null });
+            res.render('index', { user: req.user, weatherMessage: null, countryData: null });
         }
     } catch (error) {
         console.error(error);
-        res.render('index', { messages: req.flash(), user: req.user, weatherMessage: null, countryData: null });
+        res.render('index', { user: req.user, weatherMessage: null, countryData: null });
     }
 });
 
-// Add the new route handler for /about
-router.get('/about', (req, res) => {
-    res.render('about', { user: req.user });
-});
-
-// Add the new route handler for /landmarks
-router.get('/landmarks', async (req, res) => {
-    const searchTerm = req.query.q || '';
-    try {
-        const [results] = await db.query('SELECT * FROM landmarks WHERE name LIKE ? OR location LIKE ?', [`%${searchTerm}%`, `%${searchTerm}%`]);
-        res.render('landmarks', { user: req.user, searchResults: results, errorMessage: null, successMessage: null });
-    } catch (error) {
-        console.error(error);
-        res.render('landmarks', { user: req.user, searchResults: [], errorMessage: 'An error occurred', successMessage: null });
-    }
-});
-
+// Handle landmark upload
 router.post('/landmarks', upload.single('image'), async (req, res) => {
     const { name, location } = req.body;
     const image = req.file.filename;
