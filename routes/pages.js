@@ -32,7 +32,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.get('/', (req, res) => {
-    res.render('index', { messages: req.flash(), user: req.user, weatherMessage: null, countryData: null });
+    res.render('index', { csrfToken: req.csrfToken(), user: req.user, weatherMessage: null, countryData: null });
 });
 
 // Add this route to handle direct access to /auth/register
@@ -56,9 +56,9 @@ router.get('/weather', (req, res, next) => {
                     ' degrees in ' + weather.name +
                     '! The humidity now is: ' + 
                     weather.main.humidity;
-                res.render('index', { messages: req.flash(), user: req.user, weatherMessage: weatherMessage, countryData: null });
+                res.render('index', { csrfToken: req.csrfToken(), user: req.user, weatherMessage: weatherMessage, countryData: null });
             } else {
-                res.render('index', { messages: req.flash(), user: req.user, weatherMessage: "No data found", countryData: null });
+                res.render('index', { csrfToken: req.csrfToken(), user: req.user, weatherMessage: "No data found", countryData: null });
             }
         } 
     });

@@ -19,6 +19,7 @@ CREATE TABLE landmarks (
     name VARCHAR(100),
     description TEXT,
     location VARCHAR(255),
+    image VARCHAR(255),
     PRIMARY KEY(id)
 );
 

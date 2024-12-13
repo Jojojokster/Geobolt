@@ -8,7 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
         pwShowHide = document.querySelectorAll(".pw_hide"),
         loginForm = document.querySelector(".login_form form"),
         signupForm = document.querySelector(".signup_form form"),
-        errorMessage = document.getElementById('error-message');
+        errorMessage = document.getElementById('error-message'),
+        successMessage = document.getElementById('success-message');
 
     if (formOpenBtn) {
         formOpenBtn.addEventListener("click", () => formContainer.classList.add("show"));
@@ -51,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const email = loginForm.querySelector("input[name='email']").value;
             const password = loginForm.querySelector("input[name='password']").value;
+            const csrfToken = loginForm.querySelector("input[name='_csrf']").value;
             if (!email || !password) {
                 errorMessage.textContent = "Please fill in all fields";
                 errorMessage.style.display = "block";
@@ -60,7 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/auth/login', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'CSRF-Token': csrfToken // Include CSRF token in headers
                 },
                 body: JSON.stringify({ email, password })
             });
@@ -82,6 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = signupForm.querySelector("input[name='email']").value;
             const password = signupForm.querySelector("input[name='password']").value;
             const confirmPassword = signupForm.querySelector("input[name='confirm_password']").value;
+            const csrfToken = signupForm.querySelector("input[name='_csrf']").value;
 
             if (!name || !email || !password || !confirmPassword) {
                 errorMessage.textContent = "Please fill in all fields";
@@ -98,7 +102,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/auth/register', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'CSRF-Token': csrfToken // Include CSRF token in headers
                 },
                 body: JSON.stringify({ name, email, password, confirm_password: confirmPassword })
             });
@@ -107,7 +112,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 errorMessage.textContent = result.message;
                 errorMessage.style.display = "block";
             } else {
-                window.location.href = '/';
+                successMessage.textContent = result.message;
+                successMessage.style.display = "block";
+                errorMessage.style.display = "none";
             }
         });
     }
