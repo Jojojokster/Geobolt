@@ -5,6 +5,7 @@ const passport = require('passport');
 const flash = require('express-flash');
 const session = require('express-session');
 
+// Create a connection pool to the MySQL database
 const db = mysql.createPool({
     host: process.env.DATABASE_HOST,
     user: process.env.DATABASE_USER,
@@ -12,10 +13,12 @@ const db = mysql.createPool({
     database: process.env.DATABASE
 });
 
+// Handle user registration
 exports.register = async (req, res) => {
     try {
         const { name, email, password, confirm_password } = req.body;
 
+        // Validate input fields
         if (!name || !email || !password || !confirm_password) {
             return res.json({
                 status: 'error',
@@ -23,6 +26,7 @@ exports.register = async (req, res) => {
             });
         }
 
+        // Check if passwords match
         if (password !== confirm_password) {
             return res.json({
                 status: 'error',
@@ -30,8 +34,8 @@ exports.register = async (req, res) => {
             });
         }
 
+        // Check if the email is already registered
         const [results] = await db.query('SELECT email FROM users WHERE email = ?', [email]);
-
         if (results.length > 0) {
             return res.json({
                 status: 'error',
@@ -39,6 +43,7 @@ exports.register = async (req, res) => {
             });
         }
 
+        // Hash the password and insert the new user into the database
         const hashedPassword = await bcrypt.hash(password, 8);
         await db.query('INSERT INTO users SET ?', {
             name: name,
@@ -46,6 +51,7 @@ exports.register = async (req, res) => {
             password: hashedPassword
         });
 
+        // Return success message
         return res.json({
             status: 'success',
             message: 'Registration successful!'
@@ -60,6 +66,7 @@ exports.register = async (req, res) => {
     }
 };
 
+// Handle user login
 exports.login = (req, res, next) => {
     passport.authenticate('local', (err, user, info) => {
         if (err) {

@@ -64,6 +64,7 @@ const db = mysql.createPool({
 // Make the database connection available globally
 global.db = db;
 
+// Test the database connection
 db.getConnection()
     .then(() => {
         console.log('Connected to database');
@@ -92,10 +93,12 @@ app.use('/auth', require('./routes/auth.js'));
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Render the home page with CSRF token
 app.get('/', (req, res) => {
     res.render("index", { csrfToken: req.csrfToken(), user: req.user });
 });
 
+// Handle logout
 app.post("/logout", (req, res) => {
     req.logout(err => {
         if (err) return next(err);
